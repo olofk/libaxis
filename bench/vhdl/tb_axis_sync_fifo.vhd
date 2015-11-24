@@ -24,7 +24,6 @@ use ieee.std_logic_1164.all;
 library osvvm;
 use osvvm.RandomPkg.RandomPType;
 library libaxis_1;
-use libaxis_1.axis_bfm.all;
 
 entity tb_axis_sync_fifo is
 
@@ -38,6 +37,8 @@ architecture tb of tb_axis_sync_fifo is
 
   constant WIDTH : positive := 16;
   subtype data_type is std_ulogic_vector(WIDTH-1 downto 0);
+  package bfm is new libaxis_1.axis_bfm
+    generic map (data_type => data_type);
 
   type data_type_arr is array (natural range <>) of data_type;
 
@@ -79,7 +80,7 @@ begin
 
     for idx in 0 to TRANSACTIONS-1 loop
       words(idx) := RV.RandSlv(WIDTH);
-      axis_send_word(clk,
+      bfm.send_word(clk,
                      s_tdata,
                      s_tvalid,
                      s_tready,
@@ -95,7 +96,7 @@ begin
     variable exp : data_type;
   begin
     for idx in 0 to TRANSACTIONS-1 loop
-      axis_recv_word(clk,
+      bfm.recv_word(clk,
                      m_tdata,
                      m_tvalid,
                      m_tready,

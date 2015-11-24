@@ -116,7 +116,7 @@ package body axis_bfm is
     variable last : boolean;
   begin
     for idx in buf'range loop
-      tlast_o <= '1' when (idx = buf'length-1) else '0';
+      tlast_o <= '1' when (idx = buf'high) else '0';
       send_word(clk, tdata_o, tvalid_o, tready_i, buf(idx), rate);
     end loop;
   end procedure;

@@ -28,7 +28,9 @@ use osvvm.RandomPkg.RandomPType;
 
 library libstorage_1;
 use libstorage_1.libstorage_pkg.all;
+
 library libaxis_1;
+use libaxis_1.axis_bfm.all;
 
 entity tb_axis_framer is
 
@@ -43,9 +45,6 @@ architecture tb of tb_axis_framer is
   constant WIDTH : positive := 16;
   constant MAX_PKT_LEN : positive := 10;
   subtype data_type is std_ulogic_vector(WIDTH-1 downto 0);
-
-
-  package bfm is new libaxis_1.axis_bfm;
 
   subtype t_header is t_mem(0 to HEADER_LEN-1)(WIDTH-1 downto 0);
 
@@ -122,13 +121,13 @@ begin
 
     for idx in 0 to TRANSACTIONS-1 loop
       header <= packets(idx).buf(header'range);
-      bfm.send_packet(clk,
-                      s_tdata,
-                      s_tlast,
-                      s_tvalid,
-                      s_tready,
-                      packets(idx).buf(HEADER_LEN to packets(idx).len-1),
-                      0.9);
+      send_packet(clk,
+                  s_tdata,
+                  s_tlast,
+                  s_tvalid,
+                  s_tready,
+                  packets(idx).buf(HEADER_LEN to packets(idx).len-1),
+                  0.9);
     end loop;
     wait;
   end process;
@@ -140,14 +139,14 @@ begin
   begin
     wait until falling_edge(rst);
     for idx in 0 to TRANSACTIONS-1 loop
-      bfm.recv_packet(clk,
-                      m_tdata,
-                      m_tlast,
-                      m_tvalid,
-                      m_tready,
-                      rec.buf,
-                      rec.len,
-                      0.5);
+      recv_packet(clk,
+                  m_tdata,
+                  m_tlast,
+                  m_tvalid,
+                  m_tready,
+                  rec.buf,
+                  rec.len,
+                  0.5);
       exp := packets(idx);
       assert exp.len = rec.len report "Mismatch in packet length" severity failure;
       for w in 0 to rec.len-1 loop

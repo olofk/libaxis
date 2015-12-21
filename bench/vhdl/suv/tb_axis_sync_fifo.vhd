@@ -28,6 +28,7 @@ library libstorage_1;
 use libstorage_1.libstorage_pkg.all;
 
 library libaxis_1;
+use libaxis_1.axis_bfm.all;
 
 entity tb_axis_sync_fifo is
 
@@ -41,8 +42,6 @@ architecture tb of tb_axis_sync_fifo is
 
   constant WIDTH : positive := 16;
   subtype data_type is std_ulogic_vector(WIDTH-1 downto 0);
-
-  package bfm is new libaxis_1.axis_bfm;
 
   signal clk : std_ulogic := '1';
   signal rst : std_ulogic := '1';
@@ -81,12 +80,12 @@ begin
 
     for idx in 0 to TRANSACTIONS-1 loop
       words(idx) := RV.RandSlv(WIDTH);
-      bfm.send_word(clk,
-                     s_tdata,
-                     s_tvalid,
-                     s_tready,
-                     words(idx),
-                     0.5);
+      send_word(clk,
+                s_tdata,
+                s_tvalid,
+                s_tready,
+                words(idx),
+                0.5);
     end loop;
     wait;
   end process;
@@ -97,12 +96,12 @@ begin
     variable exp : data_type;
   begin
     for idx in 0 to TRANSACTIONS-1 loop
-      bfm.recv_word(clk,
-                     m_tdata,
-                     m_tvalid,
-                     m_tready,
-                     rec,
-                     0.5);
+      recv_word(clk,
+                m_tdata,
+                m_tvalid,
+                m_tready,
+                rec,
+                0.5);
       exp := words(idx);
       assert exp = rec report "Mismatch in data" severity failure;
     end loop;

@@ -30,6 +30,7 @@ library libstorage_1;
 use libstorage_1.libstorage_pkg.all;
 
 library libaxis_1;
+use libaxis_1.axis_bfm.all;
 
 entity tb_axis_packet_fifo is
 
@@ -44,8 +45,6 @@ architecture tb of tb_axis_packet_fifo is
   constant WIDTH : positive := 16;
   constant MAX_PKT_LEN : positive := 10;
   subtype data_type is std_ulogic_vector(WIDTH-1 downto 0);
-
-  package bfm is new libaxis_1.axis_bfm;
 
   signal clk : std_ulogic := '1';
   signal rst : std_ulogic := '1';
@@ -107,7 +106,7 @@ begin
 
 
     for idx in 0 to TRANSACTIONS-1 loop
-      bfm.send_packet(clk,
+      send_packet(clk,
                       s_tdata,
                       s_tlast,
                       s_tvalid,
@@ -125,7 +124,7 @@ begin
   begin
     wait until falling_edge(rst);
     for idx in 0 to TRANSACTIONS-1 loop
-      bfm.recv_packet(clk,
+      recv_packet(clk,
                       m_tdata,
                       m_tlast,
                       m_tvalid,
